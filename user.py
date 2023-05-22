@@ -1,5 +1,17 @@
-import json
+import json, os
 from datetime import datetime
+from db import DatabaseManager
+from dotenv import load_dotenv
+
+load_dotenv()
+
+db_database = os.getenv('database')
+db_user = os.getenv('user')
+db_password = os.getenv('password')
+db_host = os.getenv('host')
+db_port = os.getenv('port')
+
+
 
 class User:
     '''Represents a user in the system with methods for user registration, login, 
@@ -8,16 +20,11 @@ class User:
     def __init__(self):
         self.active_user = ''
 
-
-    def register(self, username, password, is_admin=False):
+    def register(self, username, password, is_admin='false'):
         '''Adding a new user'''
 
-        with open('user_info.json', 'r', encoding='utf-8') as file:
-            user_data = json.load(file)
-        user_data[(username)] = {'password':password, 'is_admin': is_admin}
-
-        with open('user_info.json', 'w', encoding='utf-8') as file:
-            json.dump(user_data, file)
+        db = DatabaseManager(db_database, db_user, db_password, db_host)
+        db.add_user(username, password, is_admin)
         msg = f'User {username} succesfully registered'
 
         return json.dumps(msg, indent=1)
