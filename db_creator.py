@@ -23,19 +23,19 @@ except errors.DuplicateDatabase:
 conn.close()
 
 #Connect to database
-conn = psycopg2.connect(user=user, password=password, host = host)
+conn = psycopg2.connect(database = database, user=user, password=password, host = host)
 c = conn.cursor()
 
 #Create Tables
 
 query = """CREATE TABLE user_info (
-            user_id INTEGER PRIMARY KEY,
+            user_id SERIAL PRIMARY KEY,
             user_name TEXT,
             password TEXT,
             is_admin BOOLEAN NOT NULL);
 
         CREATE TABLE unread_messages (
-            message_id INTEGER PRIMARY KEY,
+            message_id SERIAL PRIMARY KEY,
             message_time TIME NOT NULL,
             sender TEXT,
             reciver TEXT,
