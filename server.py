@@ -69,7 +69,10 @@ class Server:
                 connection.send(self.available_commands().encode('utf8'))
 
             elif query_list[0] == 'register':
-                connection.send(self.user.register(query_list[1],query_list[2]).encode('utf8'))
+                try:
+                    connection.send(self.user.register(query_list[1],query_list[2],query_list[3]).encode('utf8'))
+                except:
+                    connection.send(self.user.register(query_list[1],query_list[2]).encode('utf8'))
 
             elif query_list[0] == 'login':
                 connection.send(self.user.login(query_list[1],query_list[2]).encode('utf8'))
