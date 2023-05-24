@@ -30,7 +30,7 @@ c = conn.cursor()
 
 query = """CREATE TABLE user_info (
             user_id SERIAL PRIMARY KEY,
-            user_name TEXT,
+            user_name TEXT UNIQUE,
             password TEXT,
             is_admin BOOLEAN NOT NULL);
 
