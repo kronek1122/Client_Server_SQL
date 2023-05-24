@@ -5,6 +5,7 @@ class DatabaseManager:
         self.conn = psycopg2.connect(database=database, user = user, password = password, host = host)
         self.c = self.conn.cursor()
 
+
     def add_user(self, user_name, password, is_admin):
         query = "INSERT INTO user_info (user_name, password, is_admin) VALUES (%s, %s, %s);"
         try: 
@@ -14,8 +15,8 @@ class DatabaseManager:
         except psycopg2.errors.UniqueViolation:
             self.conn.rollback()
             msg = 'User already exist'
-        
         return msg
+
 
     def login_user(self, user_name, password):
         query = "SELECT * FROM user_info WHERE user_name = (%s) AND password = (%s)"
@@ -27,5 +28,10 @@ class DatabaseManager:
         else:
             msg = "Wrong password or user doesn't exist"
             user_name = ''
-        
         return msg, user_name
+
+
+    def get_users(self):
+        query = "SELECT user_name FROM user_info"
+        self.c.execute(query)
+        return self.c.fetchall()

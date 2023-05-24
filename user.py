@@ -39,14 +39,9 @@ class User:
         '''return list of existing users'''
 
         if self.active_user != '':
-            list_of_user = []
-            with open('user_info.json', 'r', encoding='utf-8') as file:
-                user_data = json.load(file)
-
-            for user in user_data:
-                list_of_user.append(user)
-
-            return json.dumps(list_of_user, indent=1)
+            db = DatabaseManager(db_database, db_user, db_password, db_host)
+            all_users = db.get_users()
+            return json.dumps(all_users)
 
         else:
             return json.dumps("You have to be logged to check list of users", indent=1)
