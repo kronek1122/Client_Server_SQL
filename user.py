@@ -24,11 +24,8 @@ class User:
         '''Adding a new user'''
 
         db = DatabaseManager(db_database, db_user, db_password, db_host)
-        db.add_user(username, password, is_admin)
-        msg = f'User {username} succesfully registered'
-
+        msg = db.add_user(username, password, is_admin)
         return json.dumps(msg, indent=1)
-
 
     def login(self, username, password):
         '''Login user function'''
