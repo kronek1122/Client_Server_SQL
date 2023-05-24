@@ -19,6 +19,13 @@ class DatabaseManager:
 
     def login_user(self, user_name, password):
         query = "SELECT * FROM user_info WHERE user_name = (%s) AND password = (%s)"
-        if self.c.execute(query, (user_name, password)):
+        self.c.execute(query, (user_name, password))
+        rows = self.c.fetchall()
 
-            return 
+        if len(rows)>0:
+            msg = "User succesfully login"
+        else:
+            msg = "Wrong password or user doesn't exist"
+            user_name = ''
+        
+        return msg, user_name

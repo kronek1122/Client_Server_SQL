@@ -30,18 +30,8 @@ class User:
     def login(self, username, password):
         '''Login user function'''
 
-        with open('user_info.json', 'r', encoding='utf-8') as file:
-            user_data = json.load(file)
-
-        if username in user_data:
-            if user_data[username]['password'] == password:
-                msg = f'User {username} successfully login'
-                self.active_user = username
-            else:
-                msg = f'Wrong password for {username} account'
-        else:
-            msg = "User doesn't exist"
-
+        db = DatabaseManager(db_database, db_user, db_password, db_host)
+        msg, self.active_user = db.login_user(username, password)
         return json.dumps(msg, indent=1)
 
 
