@@ -1,5 +1,4 @@
 import json, os
-from datetime import datetime
 from db import DatabaseManager
 from dotenv import load_dotenv
 
@@ -69,56 +68,33 @@ class User:
     def check_inbox(self, query):
         '''return messages in user inbox'''
 
-        with open('user_info.json', 'r', encoding='utf-8') as file:
-            user_data = json.load(file)
+        db = DatabaseManager(db_database, db_user, db_password, db_host)
 
         if self.active_user != '':
-            if len(query)>1 and user_data[self.active_user]['is_admin'] is True:
-                try:
-                    with open(query[1] + '.json', 'r', encoding='utf-8') as file:
-                        user_messages = json.load(file)
-                        try:
-                            del user_messages['unread_messages']
-                        except KeyError:
-                            pass
-                    return json.dumps(user_messages, indent=1)
-                except (FileNotFoundError, json.decoder.JSONDecodeError):
-                    msg = 'Your inbox is empty'
-
-            elif len(query)>1 and user_data[self.active_user]['is_admin'] is False:
+            if len(query)>1 and db.is_user_admin(self.active_user) is True:
+                msg = db.get_message(query[1])
+                
+            elif len(query)>1 and db.is_user_admin(self.active_user) is False:
                 msg = 'You do not have permission to check another user mail'
 
             else:
-                try:
-                    with open(self.active_user + '.json', 'r', encoding='utf-8') as file:
-                        user_messages = json.load(file)
-                        try:
-                            del user_messages['unread_messages']
-                        except KeyError:
-                            pass
-                    return json.dumps(user_messages, indent=1)
-                except (FileNotFoundError, json.decoder.JSONDecodeError):
-                    msg = 'Your inbox is empty'
-
+                msg = db.get_message(self.active_user)
+                db.change_from_unread(self.active_user)
+            
         else: msg = 'First you must log in!'
         return json.dumps(msg, indent=1)
 
 
     def check_unread_messages(self):
         '''return only unread messages in user inbox'''
-
+        
+        db = DatabaseManager(db_database, db_user, db_password, db_host)
         if self.active_user != '':
-            try:
-                with open(self.active_user + '.json', 'r', encoding='utf-8') as file:
-                    user_messages = json.load(file)
-                    if 'unread_messages' in user_messages:
-                        msg = user_messages['unread_messages']
-                        del user_messages['unread_messages']
-                        with open(self.active_user + '.json', 'w', encoding='utf-8') as file:
-                            json.dump(user_messages, file)
-                    else: msg = 'Your unread messages inbox is empty'
-            except (FileNotFoundError, json.decoder.JSONDecodeError):
-                msg = 'Your unread messages inbox is empty'
+            if db.is_msg_unread(self.active_user):
+                msg = db.get_unread_message(self.active_user)
+                db.change_from_unread(self.active_user)
+            else:
+                msg = "Your unread message inbox is empty"
         else:
             msg = 'First you must log in!'
         return json.dumps(msg, indent=1)
