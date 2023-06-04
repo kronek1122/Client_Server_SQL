@@ -76,3 +76,36 @@ class DatabaseManager:
             return is_admin
         else:
             return False
+        
+
+    def get_message(self, user_name):
+        query = f"SELECT sender, TO_CHAR(timestamp, 'YYYY-MM-DD HH:MI:SS'), message_text FROM {user_name};"
+        self.c.execute(query)
+        msg = self.c.fetchall()
+        if msg == []:
+            msg = "Inbox in empty"
+        return msg
+    
+
+    def get_unread_message(self, user_name):
+        query = f"SELECT sender, TO_CHAR(timestamp, 'YYYY-MM-DD HH:MI:SS'), message_text FROM {user_name} WHERE is_unread = TRUE;"
+        self.c.execute(query)
+        msg = self.c.fetchall()
+        return msg
+
+
+    def is_msg_unread(self, user_name):
+        query = f"SELECT is_unread FROM {user_name} WHERE is_unread = TRUE;"
+        self.c.execute(query)
+        result = self.c.fetchone()
+        if result is not None:
+            is_unread = bool(result[0])
+            return is_unread
+        else:
+            return False
+        
+
+    def change_from_unread(self,user_name):
+        query = f"UPDATE {user_name} SET is_unread = FALSE WHERE is_unread = TRUE;"
+        self.c.execute(query)
+        self.conn.commit()
