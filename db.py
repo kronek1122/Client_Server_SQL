@@ -45,7 +45,7 @@ class DatabaseManager:
 
 
     def send_message(self, user_name, message, sender):
-        values = (''.join(message), sender, True)
+        values = (' '.join(message), sender, True)
         query = f"INSERT INTO {user_name} (message_text, sender, is_unread) VALUES {values};"
         try: 
             self.c.execute(query)
