@@ -42,7 +42,7 @@ class User:
             db = DatabaseManager(db_database, db_user, db_password, db_host)
             all_users = db.get_users()
             return json.dumps(all_users)
-
+        
         else:
             return json.dumps("You have to be logged to check list of users", indent=1)
 
@@ -50,11 +50,7 @@ class User:
     def send_message(self, username, message):
         '''sending message to other users'''
 
-        with open('user_info.json', 'r', encoding='utf-8') as file:
-            user_data = json.load(file)
-
-        if username not in user_data:
-            return json.dumps("User doesn't exist", indent=1)
+        db = DatabaseManager(db_database, db_user, db_password, db_host)
 
         if not self.active_user:
             return json.dumps('Command available only for logged users', indent=1)
@@ -62,29 +58,9 @@ class User:
         if self.active_user == username:
             return json.dumps("You can't send message to yourself", indent=1)
 
-        try:
-            with open(username + '.json', 'r', encoding='utf-8') as file:
-                mailbox = json.load(file)
-        except (FileNotFoundError, json.decoder.JSONDecodeError):
-            mailbox = {}
-
-        if 'unread_messages' in mailbox:
-            if len(mailbox['unread_messages']) >= 5 and not user_data[self.active_user]['is_admin']:
-                return json.dumps(f'Message could not be sent, mailbox user {username} is full', indent=1)
-            else:
-                mailbox['unread_messages'][datetime.now().strftime("%Y-%m-%d %H:%M:%S")] = ' '.join(message)
-        else:
-            mailbox['unread_messages'] = {datetime.now().strftime("%Y-%m-%d %H:%M:%S")+ ' , ' + self.active_user : ' '.join(message)}
-
-        if self.active_user in mailbox:
-            mailbox[self.active_user][datetime.now().strftime("%Y-%m-%d %H:%M:%S")] = ' '.join(message)
-        else:
-            mailbox[self.active_user] = {datetime.now().strftime("%Y-%m-%d %H:%M:%S") : ' '.join(message)}
-
-        with open(username + '.json', 'w', encoding='utf-8') as file:
-            json.dump(mailbox, file)
-
-        return json.dumps(f'You successfully send message to user {username}', indent=1)
+        msg = db.send_message(username, message, self.active_user)
+        
+        return json.dumps(msg, indent=1)
 
 
     def check_inbox(self, query):

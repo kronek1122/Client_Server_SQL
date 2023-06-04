@@ -8,8 +8,15 @@ class DatabaseManager:
 
     def add_user(self, user_name, password, is_admin):
         query = "INSERT INTO user_info (user_name, password, is_admin) VALUES (%s, %s, %s);"
+        user_table = f"""CREATE TABLE {user_name} (
+                        message_id SERIAL PRIMARY KEY,
+                        message_text VARCHAR(255),
+                        sender VARCHAR(50),
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        is_unread BOOLEAN);"""
         try: 
             self.c.execute(query, (user_name, password, is_admin))
+            self.c.execute(user_table)
             self.conn.commit()
             msg = 'User succesfully registered'
         except psycopg2.errors.UniqueViolation:
@@ -35,3 +42,18 @@ class DatabaseManager:
         query = "SELECT user_name FROM user_info"
         self.c.execute(query)
         return self.c.fetchall()
+
+
+    def send_message(self, user_name, message, sender):
+        values = (''.join(message), sender, True)
+        query = f"INSERT INTO {user_name} (message_text, sender, is_unread) VALUES {values};"
+        try: 
+            self.c.execute(query)
+            self.conn.commit()
+            msg = f'You successfully send message to user {user_name}'
+        except psycopg2.errors.UndefinedTable:
+            self.conn.rollback()
+            msg = "User doesn't exist"
+        return msg
+
+
