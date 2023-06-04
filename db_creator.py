@@ -26,25 +26,18 @@ conn.close()
 conn = psycopg2.connect(database = database, user=user, password=password, host = host)
 c = conn.cursor()
 
-#Create Tables
-
+#Create Main Table
 query = """CREATE TABLE user_info (
             user_id SERIAL PRIMARY KEY,
-            user_name TEXT UNIQUE,
-            password TEXT,
-            is_admin BOOLEAN NOT NULL);
-
-        CREATE TABLE unread_messages (
-            message_id SERIAL PRIMARY KEY,
-            message_time TIME NOT NULL,
-            sender TEXT,
-            reciver TEXT,
-            message TEXT);"""
+            user_name VARCHAR(50) UNIQUE,
+            password VARCHAR(50),
+            is_admin BOOLEAN NOT NULL);"""
 
 try:
     c.execute(query)
 except errors.DuplicateTable:
     pass
+
 
 conn.commit()
 conn.close()
