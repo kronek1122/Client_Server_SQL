@@ -57,3 +57,22 @@ class DatabaseManager:
         return msg
 
 
+    def count_unread(self, user_name):
+        query = f"SELECT COUNT(*) FROM {user_name} WHERE is_unread = 'TRUE';"
+        self.c.execute(query)
+        result = self.c.fetchone()
+        if result is not None:
+            return result[0]
+        else:
+            return 0
+
+
+    def is_user_admin(self, user_name):
+        query = f"SELECT is_admin FROM user_info WHERE user_name = '{user_name}'"
+        self.c.execute(query)
+        result = self.c.fetchone()
+        if result is not None:
+            is_admin = bool(result[0])
+            return is_admin
+        else:
+            return False
