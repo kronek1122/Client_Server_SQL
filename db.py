@@ -89,7 +89,7 @@ class DatabaseManager:
         self.c.execute(query)
         msg = self.c.fetchall()
         if msg == []:
-            msg = "Inbox in empty"
+            msg = "Inbox is empty"
         return msg
     
 

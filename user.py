@@ -53,7 +53,7 @@ class User:
 
         if self.active_user == username:
             return json.dumps("You can't send message to yourself", indent=1)
-
+    
         if self.db.count_unread(username) >= 5 and not (self.db.is_user_admin(self.active_user) or self.db.is_user_admin(username)):
             msg = f'Message could not be sent, mailbox user {username} is full'
         else:
