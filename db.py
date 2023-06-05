@@ -42,6 +42,12 @@ class DatabaseManager:
         query = "SELECT user_name FROM user_info"
         self.c.execute(query)
         return self.c.fetchall()
+    
+
+    def get_user(self,user_name):
+        query = f"SELECT user_name FROM user_info WHERE user_name = '{user_name}'"
+        self.c.execute(query)
+        return self.c.fetchone()
 
 
     def send_message(self, user_name, message, sender):
