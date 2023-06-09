@@ -1,6 +1,7 @@
 import json, os
 from db import DatabaseManager
 from dotenv import load_dotenv
+import psycopg2
 
 load_dotenv()
 
@@ -53,11 +54,14 @@ class User:
 
         if self.active_user == username:
             return json.dumps("You can't send message to yourself", indent=1)
-    
-        if self.db.count_unread(username) >= 5 and not (self.db.is_user_admin(self.active_user) or self.db.is_user_admin(username)):
-            msg = f'Message could not be sent, mailbox user {username} is full'
-        else:
-            msg = self.db.send_message(username, message, self.active_user)
+        
+        try:
+            if self.db.count_unread(username) >= 5 and not (self.db.is_user_admin(self.active_user) or self.db.is_user_admin(username)):
+                msg = f'Message could not be sent, mailbox user {username} is full'
+            else:
+                msg = self.db.send_message(username, message, self.active_user)
+        except psycopg2.errors.UndefinedTable:
+            msg = "User doesn't exist"
         
         return json.dumps(msg, indent=1)
 
