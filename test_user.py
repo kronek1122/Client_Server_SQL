@@ -113,30 +113,28 @@ class TestUser(unittest.TestCase):
         self.assertEqual(self.user.send_message(self.to_user, self.message), expected_output)
     
 
-    """def test_check_inbox_success(self):
+    def test_check_inbox_success(self):
         '''Test check_inbox successfully'''
 
         self.user.active_user = 'test_user'
-        with patch('builtins.open', create=True) as mocked_file:
-            mocked_file.return_value.__enter__.return_value.read.return_value = '{"2023-04-05 10:01:12": "Hello, how are you?"}'
-            expected_output = json.dumps({"2023-04-05 10:01:12": "Hello, how are you?"},indent=1)
-            self.assertEqual(self.user.check_inbox(['']), expected_output)
+        expected_output = json.dumps('Inbox is empty', indent=1)
+        self.assertEqual(self.user.check_inbox(['']), expected_output)
 
 
     def test_send_message_successfully(self):
         '''Test send message successfully'''
 
-        self.user.login(self.test_user_one['username'], self.test_user_one['password'])
-        expected_output = json.dumps(f'You successfully send message to user {self.test_admin}', indent=1)
-        self.assertEqual(self.user.send_message(self.test_admin, self.message), expected_output)
+        self.user.active_user = 'test_user'
+        expected_output = json.dumps('You successfully send message to user test_admin', indent=1)
+        self.assertEqual(self.user.send_message(self.test_admin['username'], self.message), expected_output)
+
 
     def test_send_message_with_missing_username(self):
         '''Test send message with missing username'''
 
         self.user.login(self.test_user_one['username'], self.test_user_one['password'])
         expected_output = json.dumps("User doesn't exist", indent=1)
-        self.assertEqual(self.user.send_message('undefined', self.message), expected_output)
-"""
+        self.assertEqual(self.user.send_message('undefined_user', self.message), expected_output)
 
 
     def test_check_inbox_unauthorized_user(self):
@@ -163,18 +161,13 @@ class TestUser(unittest.TestCase):
         self.assertEqual(self.user.check_inbox(['inbox','to_user']), expected_output)
 
 
-    """def test_check_inbox_admin_success(self):
+    def test_check_inbox_admin_success(self):
         '''Test checking another user's inbox when being an admin'''
 
         self.user.active_user = "test_admin"
 
-        expected_output = json.dumps({"test_user": {"2023-04-01 12:00:00": "Test message 1",
-                                                    "2023-04-01 12:05:00": "Test message 2",
-                                                    "2023-04-01 12:10:00": "Test message 3",
-                                                    "2023-04-01 12:15:00": "Test message 4",
-                                                    "2023-04-01 12:20:00": "Test message 5" 
-                                                    }},indent=1)
-        self.assertEqual(self.user.check_inbox(['inbox', 'to_user']), expected_output)"""
+        expected_output = '"Inbox is empty"'
+        self.assertEqual(self.user.check_inbox(['inbox', 'test_user']), expected_output)
 
 
     def test_check_unread_messages_logged_out(self):
@@ -191,17 +184,6 @@ class TestUser(unittest.TestCase):
         expected_output = "Your unread message inbox is empty"
         self.assertEqual(json.loads(self.user.check_unread_messages()), expected_output)
 
-
-"""
-    def test_check_unread_messages_existing_unread_messages(self):
-        '''Test checking existing unread messages in inbox'''
-
-        self.user.active_user = "test_user"
-        with patch('builtins.open', create=True) as mocked_file:
-            mocked_file.return_value.__enter__.return_value.read.return_value = '{"unread_messages": {"2023-04-05 09:45:32": "How are you?"}}'
-            expected_output = {"2023-04-05 09:45:32": "How are you?"}
-            self.assertEqual(json.loads(self.user.check_unread_messages()), expected_output)
-"""
 
 if __name__ == '__main__':
     unittest.main()
